@@ -118,6 +118,7 @@ public class MainScreenActivity extends Activity {
 	            int success = json.getInt(TAG_SUCCESS);
 	
 	            if (success != 1) {
+	            	id_visiteur = 0;
 	    	        cancel(true);
 
         	        pDialog.dismiss();

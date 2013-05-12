@@ -44,6 +44,7 @@ public class AllCRActivity extends ListActivity {
     private static final String TAG_CR = "compteRendus";
     private static final String TAG_ID = "id_compterendu";
     private static final String TAG_MOTIF = "motif";
+    private static final String TAG_BILAN = "bilan";
  
     // products JSONArray
     JSONArray products = null;
@@ -154,6 +155,7 @@ public class AllCRActivity extends ListActivity {
                         // Storing each json item in variable
                         String id = c.getString(TAG_ID);
                         String motif = c.getString(TAG_MOTIF);
+                        String bilan = c.getString(TAG_BILAN);
  
                         // creating new HashMap
                         HashMap<String, String> map = new HashMap<String, String>();
@@ -161,6 +163,7 @@ public class AllCRActivity extends ListActivity {
                         // adding each child node to HashMap key => value
                         map.put(TAG_ID, id);
                         map.put(TAG_MOTIF, motif);
+                        map.put(TAG_BILAN, bilan);
  
                         // adding HashList to ArrayList
                         crList.add(map);
@@ -188,8 +191,8 @@ public class AllCRActivity extends ListActivity {
                     ListAdapter adapter = new SimpleAdapter(
                             AllCRActivity.this, crList,
                             R.layout.list_item, new String[] { TAG_ID,
-                            		TAG_MOTIF},
-                            new int[] { R.id.id, R.id.motif });
+                            		TAG_MOTIF, TAG_BILAN},
+                            new int[] { R.id.id, R.id.motif, R.id.bilan });
                     // updating listview
                     setListAdapter(adapter);
                 }
