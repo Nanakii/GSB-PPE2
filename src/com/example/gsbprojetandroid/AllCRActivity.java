@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
  
 import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +25,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
  
 public class AllCRActivity extends ListActivity {
+	
+	protected static int id_visiteur = 0;
  
     // Progress Dialog
     private ProgressDialog pDialog;
@@ -33,7 +36,7 @@ public class AllCRActivity extends ListActivity {
  
     ArrayList<HashMap<String, String>> crList;
  
-    // url to get all products list
+    // url pour récupérer les comptes-rendus
     private static String url_all_cr = "http://192.168.1.10/android/compterendus.php";
  
     // JSON Node names
@@ -49,6 +52,9 @@ public class AllCRActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.all_cr);
+        
+        Bundle b = getIntent().getExtras();
+        id_visiteur = b.getInt("id_visiteur");
  
         // Hashmap for ListView
         crList = new ArrayList<HashMap<String, String>>();
@@ -125,8 +131,9 @@ public class AllCRActivity extends ListActivity {
         protected String doInBackground(String... args) {
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("id_visiteur", String.valueOf(id_visiteur)));
             // getting JSON string from URL
-            JSONObject json = jParser.getJSONFromUrl(url_all_cr);
+            JSONObject json = jParser.getJSONFromUrl(url_all_cr, params);
  
             // Check your log cat for JSON reponse
             Log.d("Tous les comptes-rendus : ", json.toString());
