@@ -31,7 +31,7 @@ public class AllCRActivity extends ListActivity {
     // Progress Dialog
     private ProgressDialog pDialog;
  
-    // Creating JSON Parser object
+    // Création du JSON Parser object
     JSONParser jParser = new JSONParser();
  
     ArrayList<HashMap<String, String>> crList;
@@ -39,7 +39,7 @@ public class AllCRActivity extends ListActivity {
     // url pour récupérer les comptes-rendus
     private static String url_all_cr = "http://192.168.1.10/android/compterendus.php";
  
-    // JSON Node names
+    // JSON TAG
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_CR = "compteRendus";
     private static final String TAG_ID = "id_compterendu";
@@ -47,8 +47,8 @@ public class AllCRActivity extends ListActivity {
     private static final String TAG_BILAN = "bilan";
     private static final String TAG_PRATICIEN = "praticien";
  
-    // products JSONArray
-    JSONArray products = null;
+    // Comptes-rendus
+    JSONArray compteRendus = null;
  
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,65 +58,22 @@ public class AllCRActivity extends ListActivity {
         Bundle b = getIntent().getExtras();
         id_visiteur = b.getInt("id_visiteur");
  
-        // Hashmap for ListView
+        // Hashmap  ListView
         crList = new ArrayList<HashMap<String, String>>();
  
-        // Loading products in Background Thread
+        // Chargement des données en arrière-plan
         new LoadAllCR().execute();
  
-        // Get listview
-        ListView lv = getListView();
- 
-        // on seleting single product
-        // launching Edit Product Screen
-        /*
-         * lv.setOnItemClickListener(new OnItemClickListener() {
- 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
-                // getting values from selected ListItem
-                String pid = ((TextView) view.findViewById(R.id.id)).getText()
-                        .toString();
- 
-                // Starting new intent
-                Intent in = new Intent(getApplicationContext(),
-                        EditProductActivity.class);
-                // sending pid to next activity
-                in.putExtra(TAG_PID, pid);
- 
-                // starting new activity and expecting some response back
-                startActivityForResult(in, 100);
-            }
-        });
-        */
- 
+        ListView lv = getListView(); 
     }
  
-    // Response from Edit Product Activity
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // if result code 100
-        if (resultCode == 100) {
-            // if result code 100 is received
-            // means user edited/deleted product
-            // reload this screen again
-            Intent intent = getIntent();
-            finish();
-            startActivity(intent);
-        }
- 
-    }
+
  
     /**
-     * Background Async Task to Load all product by making HTTP Request
+     * Tache en arrière-plan pour charger les données via une requete HTTP asynchrone
      * */
     class LoadAllCR extends AsyncTask<String, String, String> {
  
-        /**
-         * Before starting background thread Show Progress Dialog
-         * */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -128,47 +85,46 @@ public class AllCRActivity extends ListActivity {
         }
  
         /**
-         * getting All products from url
+         * Récupération des comptes-rendus
          * */
         protected String doInBackground(String... args) {
-            // Building Parameters
+            // Liste des paramètres à passer
             List<NameValuePair> params = new ArrayList<NameValuePair>();
             params.add(new BasicNameValuePair("id_visiteur", String.valueOf(id_visiteur)));
-            // getting JSON string from URL
+            
+            // Récupération de l'URL
             JSONObject json = jParser.getJSONFromUrl(url_all_cr, params);
  
-            // Check your log cat for JSON reponse
+            // Log
             Log.d("Tous les comptes-rendus : ", json.toString());
  
             try {
-                // Checking for SUCCESS TAG
                 int success = json.getInt(TAG_SUCCESS);
  
                 if (success == 1) {
-                    // products found
-                    // Getting Array of Products
-                    products = json.getJSONArray(TAG_CR);
+                    // Récupération des comptes-rendus
+                	compteRendus = json.getJSONArray(TAG_CR);
  
-                    // looping through All Products
-                    for (int i = 0; i < products.length(); i++) {
-                        JSONObject c = products.getJSONObject(i);
+                    // boucle sur les comptes-rendus
+                    for (int i = 0; i < compteRendus.length(); i++) {
+                        JSONObject c = compteRendus.getJSONObject(i);
  
-                        // Storing each json item in variable
+                        // On récupère chaque donnée associé au compte-rendu
                         String id = c.getString(TAG_ID);
                         String motif = c.getString(TAG_MOTIF);
                         String bilan = c.getString(TAG_BILAN);
                         String praticien = c.getString(TAG_PRATICIEN);
  
-                        // creating new HashMap
+                        // Création HashMap
                         HashMap<String, String> map = new HashMap<String, String>();
  
-                        // adding each child node to HashMap key => value
+                        // On ajoute chaque donnée au HashMap
                         map.put(TAG_ID, id);
                         map.put(TAG_MOTIF, motif);
                         map.put(TAG_BILAN, bilan);
                         map.put(TAG_PRATICIEN, praticien);
  
-                        // adding HashList to ArrayList
+                        // On ajoute le HashMap à la ListView
                         crList.add(map);
                     }
                 }
@@ -178,14 +134,12 @@ public class AllCRActivity extends ListActivity {
  
             return null;
         }
- 
-        /**
-         * After completing background task Dismiss the progress dialog
-         * **/
+
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog after getting all products
+            // on supprime la popup une fois le chargement terminé
             pDialog.dismiss();
-            // updating UI from Background Thread
+            
+            // On met à jour l'interface utilisateur
             runOnUiThread(new Runnable() {
                 public void run() {
                     /**
@@ -196,7 +150,8 @@ public class AllCRActivity extends ListActivity {
                             R.layout.list_item, new String[] { TAG_ID,
                             		TAG_MOTIF, TAG_PRATICIEN, TAG_BILAN},
                             new int[] { R.id.id, R.id.motif, R.id.praticien, R.id.bilan });
-                    // updating listview
+                    
+                    // Mise à jour de la ListView
                     setListAdapter(adapter);
                 }
             });

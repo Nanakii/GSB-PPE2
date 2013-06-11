@@ -39,15 +39,15 @@ public class MainScreenActivity extends Activity {
     // Progress Dialog
     private ProgressDialog pDialog;
  
-    // Creating JSON Parser object
+    // Création du JSON Parser object
     JSONParser jParser = new JSONParser();
  
     ArrayList<HashMap<String, String>> crList;
  
-    // url pour éxecuter les actions
+    // url de connexion
     private static String url_login	 = "http://192.168.1.10/android/login.php";
  
-    // JSON Response node names
+    // JSON TAG
     private static final String TAG_SUCCESS 	= "success";
     private static final String TAG_ERROR 		= "error";
     private static final String TAG_ERROR_MSG 	= "error_msg";
@@ -60,17 +60,16 @@ public class MainScreenActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
  
-        // Importing all assets like buttons, text fields
+        // Création du formulaire
         inputUsername = (EditText) findViewById(R.id.loginUsername);
         inputPassword = (EditText) findViewById(R.id.loginPassword);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         loginErrorMsg = (TextView) findViewById(R.id.login_error);
  
-        // Login button Click Event
+        // Evenement sur le bouton de connexion
         btnLogin.setOnClickListener(new View.OnClickListener() {
  
             public void onClick(View view) {
-                // Loading products in Background Thread
                 new LoadLogin().execute();
             }
         });
@@ -78,13 +77,10 @@ public class MainScreenActivity extends Activity {
     
 
 	/**
-	 * Background Async Task to Load all product by making HTTP Request
+	 * Tache en arrière-plan pour charger les données via une requete HTTP asynchrone
 	 * */
 	class LoadLogin extends AsyncTask<String, String, String> {
 	
-	    /**
-	     * Before starting background thread Show Progress Dialog
-	     * */
 	    @Override
 	    protected void onPreExecute() {
 	        super.onPreExecute();
@@ -102,21 +98,21 @@ public class MainScreenActivity extends Activity {
             String username = inputUsername.getText().toString();
             String password = inputPassword.getText().toString();
             
-	        // Building Parameters
+	        // Paramètres a passer a la requete
 	        List<NameValuePair> params = new ArrayList<NameValuePair>();
 	        params.add(new BasicNameValuePair("username", username));
 	        params.add(new BasicNameValuePair("password", password));
 	        
-	        // getting JSON string from URL
+	        // on récupère l'URL
 	        JSONObject json = jParser.getJSONFromUrl(url_login, params);
 	
-	        // Check your log cat for JSON reponse
+	        // Log
 	        Log.d("Connexion en cours : ", json.toString());
 
 	        try {
-	            // Checking for SUCCESS TAG
 	            int success = json.getInt(TAG_SUCCESS);
 	
+	            // si identifiants validés par la requete HTTP
 	            if (success != 1) {
 	            	id_visiteur = 0;
 	    	        cancel(true);
@@ -138,8 +134,9 @@ public class MainScreenActivity extends Activity {
 	    protected void onPostExecute(String file_url) {
 	        pDialog.dismiss();
 
+	        // Si la connexion s'est bien déroulée
 	        if (id_visiteur > 0) {
-	            // Launch Dashboard Screen
+	            // On charge la prochaine vue (le dashboard)
 	            Intent dashboard = new Intent(getApplicationContext(), DashboardActivity.class);
 		        
 	            // On donne l'id du visiteur a la prochaine vue
@@ -147,11 +144,10 @@ public class MainScreenActivity extends Activity {
 		        b.putInt("id_visiteur", id_visiteur);
 		        dashboard.putExtras(b);
 		         
-		        // Close all views before launching Dashboard
+		        // On ferme toutes les vues précédentes
 		        dashboard.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		        startActivity(dashboard);
 		        
-		        // Close Login Screen
 		        finish();
 	        }
 	    }
